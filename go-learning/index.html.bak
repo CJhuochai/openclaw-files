@@ -299,7 +299,7 @@
 
         <div class="footer">
             <p>Go语言学习中心 · 专为Java开发者陈健设计 · 由陈皮AI助手维护</p>
-            <p>📅 开始时间: 2026-02-27 | 🕰️ 最后更新: <span id="current-time">动态计算</span> (东八区)</p>
+            <p>📅 开始时间: 2026-02-27 | 🕰️ 最后更新: 2026-02-28 19:15 (东八区)</p>
             <p style="font-size: 0.8em; margin-top: 10px; color: #ccc;">页面自动重新加载以显示最新内容 · 所有.md文件实时同步可访问</p>
         </div>
     </div>
@@ -336,63 +336,8 @@
             const daysRemaining = 56 - daysCompleted;
             document.querySelectorAll('.stat-number')[1].textContent = daysRemaining > 0 ? daysRemaining : 0;
 
+            console.log(`Go学习: 第${daysCompleted}天，剩余${daysRemaining}天`);
+        });
     </script>
 </body>
 </html>
-
-            // 显示当前时间（东八区）
-            function formatChinaTime(date) {
-                // 转换为东八区时间（UTC+8）
-                const chinaTime = new Date(date.getTime() + 8 * 60 * 60 * 1000);
-                const year = chinaTime.getUTCFullYear();
-                const month = String(chinaTime.getUTCMonth() + 1).padStart(2, '0');
-                const day = String(chinaTime.getUTCDate()).padStart(2, '0');
-                const hours = String(chinaTime.getUTCHours()).padStart(2, '0');
-                const minutes = String(chinaTime.getUTCMinutes()).padStart(2, '0');
-                return `${year}-${month}-${day} ${hours}:${minutes}`;
-            }
-
-            const currentTimeElement = document.getElementById('current-time');
-            if (currentTimeElement) {
-                const now = new Date();
-                currentTimeElement.textContent = formatChinaTime(now);
-            }
-
-            // 更新学习天数统计
-            const startDate = new Date('2026-02-27');
-            const today = new Date();
-            const daysCompleted = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-            const completedElement = document.querySelectorAll('.stat-number')[0];
-            const remainingElement = document.querySelectorAll('.stat-number')[1];
-            
-            if (completedElement) {
-                completedElement.textContent = daysCompleted > 0 ? daysCompleted : 1;
-            }
-            if (remainingElement) {
-                const daysRemaining = 56 - daysCompleted;
-                remainingElement.textContent = daysRemaining > 0 ? daysRemaining : 0;
-            }
-
-            // 标记"今日学习"卡片（Day 2）
-            const todayCard = document.querySelector('.day-card:nth-child(2)');
-            if (todayCard) {
-                const todayLabel = document.createElement('div');
-                todayLabel.style.cssText = `
-                    position: absolute;
-                    top: -10px;
-                    right: -10px;
-                    background: #ff4757;
-                    color: white;
-                    padding: 5px 15px;
-                    border-radius: 15px;
-                    font-size: 12px;
-                    font-weight: bold;
-                    z-index: 10;
-                `;
-                todayLabel.textContent = '今日学习';
-                todayCard.style.position = 'relative';
-                todayCard.appendChild(todayLabel);
-            }
-
-            console.log(`Go学习中心: 第${daysCompleted}天，剩余${56-daysCompleted}天，当前时间: ${formatChinaTime(new Date())}`);
-        });
