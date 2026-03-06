@@ -1,0 +1,27 @@
+# Sensitive
+**/.env
+
+# Dependencies
+**/node_modules/
+
+# Large artifacts / binaries
+*.tar.gz
+*.rpm
+
+# Runtime logs & generated data
+autonomous-reports/
+autonomous-reports-backup-*/
+report-logs/
+.wal-logs/
+.openclaw/
+
+# Memory backups / indexes
+memory-backups/
+.memory-index-keywords.txt
+.memory-system-status.json
+
+# Embedded/secondary repos
+github-go-learning/
+
+# Optional local caches
+.clawhub/
