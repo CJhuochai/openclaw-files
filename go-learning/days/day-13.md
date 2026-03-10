@@ -1,54 +1,44 @@
-# Go语言学习 - Day 13/56
+# Day 13/56 - 周末项目
 
-## 今日主题: panic和recover
+> 学习时长建议：30分钟  
+> 学习对象：Java 开发者转 Go
 
-## 学习目标
-✅ 深入理解Go核心概念
-✅ 掌握Java中类似功能的实现对比
-✅ 完成项目级代码编写
+## 今日学习内容
 
-## Java vs Go对比
-| 方面 | Java | Go |
-|------|------|----|
-| 函数多返回值 | 需要自定义类或数组 | 原生支持多返回值 |
-| 包管理 | Maven/Gradle + pom.xml | go modules + go.mod |
-| 错误处理 | try-catch异常机制 | 返回值错误检查 |
+🎯 Day 13/56：周末综合项目！
 
-## 详细学习内容
-- **深度解析**：今日主题的技术细节
-- **最佳实践**：官方推荐做法
-- **常见陷阱**：避免初学者的错误
-- **性能考虑**：相关性能优化技巧
+项目任务：图书管理系统
+要求：
+1. 使用struct定义Book类型
+2. 实现Library接口（AddBook, RemoveBook, FindBook）
+3. 使用slice存储图书集合
+4. 实现简单的命令行交互
 
-## 代码示例
-```go
-// Day 13 高级代码示例
-package main
-
-import (
-    "fmt"
-    "errors"
-)
-
-func main() {
-    fmt.Printf("📚 深入Go语言学习 Day 13\n")
+设计思路：
+type Book struct {
+    ID     string
+    Title  string
+    Author string
 }
-```
 
-## 时间要求
-- **建议学习时间**：40-60分钟
-- **难度等级**：⭐⭐⭐☆☆ 中级
-- **代码量**：约100-200行代码
+type Library interface {
+    AddBook(Book) error
+    RemoveBook(id string) error
+    FindBook(id string) (*Book, error)
+}
 
-## 项目实践
-- **小项目**：实现一个相关主题的小程序
-- **单元测试**：为代码编写测试
-- **性能测试**：优化代码性能
+type SimpleLibrary struct {
+    books []Book
+}
 
-## 扩展阅读
-- Go标准库相关源码
-- 开源项目中的实际应用
+💡 挑战：思考如何用Go实现Java中熟悉的模式！
 
-**创建时间**：2026-03-02 21:51:49
-**最后更新**：2026-03-02 21:51:49
-**核心技术学习** ✅
+## 打卡模板
+- [ ] 完成 3 个任务
+- [ ] 记录 1 个 Go vs Java 差异
+- [ ] 提交 1 个可运行示例
+
+## 今日复盘（3句话）
+1. 我今天最大的收获：
+2. 我遇到的阻碍：
+3. 我明天的优化动作：
