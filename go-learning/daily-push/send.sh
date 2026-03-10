@@ -8,6 +8,7 @@ set -e
 LOG_FILE="/root/.openclaw/workspace/automation-workflows/logs/daily-push.log"
 TEMPLATE_FILE="/root/.openclaw/workspace/go-learning/daily-push/REMINDER_TEMPLATE.md"
 DAYS_DIR="/root/.openclaw/workspace/go-learning/days"
+HISTORY_FILE="/root/.openclaw/workspace/go-learning/progress/daily-reminder-history.csv"
 START_DATE="2026-02-26"
 TARGET="ou_0e8a1150105275ba817a4350097db1e3"
 
@@ -37,18 +38,22 @@ if [[ ! -f "$DAY_FILE" ]]; then
   exit 1
 fi
 
+mkdir -p "$(dirname "$HISTORY_FILE")"
+[[ -f "$HISTORY_FILE" ]] || echo "date,day,title,status" > "$HISTORY_FILE"
+
 # 解析标题：# Day XX/56 - 标题
 TITLE=$(head -n 1 "$DAY_FILE" | sed -E 's/^# Day [0-9]+\/56 - //')
 
-# 解析任务：优先提取“今日任务”后的三条编号
+# 解析任务：支持 1) / 1. 两种编号
 TASKS=$(awk '
   /今日任务：/ {flag=1; next}
-  flag && /^[0-9]+\)/ {print; count++; if (count==3) exit}
+  flag && /^[0-9]+[\)\.][[:space:]]/ {print; count++; if (count==3) exit}
+  flag && /^## / {exit}
 ' "$DAY_FILE")
 
-TASK_1=$(echo "$TASKS" | sed -n '1p' | sed -E 's/^[0-9]+\)\s*//')
-TASK_2=$(echo "$TASKS" | sed -n '2p' | sed -E 's/^[0-9]+\)\s*//')
-TASK_3=$(echo "$TASKS" | sed -n '3p' | sed -E 's/^[0-9]+\)\s*//')
+TASK_1=$(echo "$TASKS" | sed -n '1p' | sed -E 's/^[0-9]+[\)\.][[:space:]]*//')
+TASK_2=$(echo "$TASKS" | sed -n '2p' | sed -E 's/^[0-9]+[\)\.][[:space:]]*//')
+TASK_3=$(echo "$TASKS" | sed -n '3p' | sed -E 's/^[0-9]+[\)\.][[:space:]]*//')
 
 # 兜底任务
 [[ -z "$TASK_1" ]] && TASK_1="阅读今日主题与核心概念"
@@ -67,8 +72,10 @@ CONTENT=${CONTENT//\{\{TASK_3\}\}/$TASK_3}
 if command -v openclaw >/dev/null 2>&1; then
   echo "$CONTENT" | openclaw message send --channel feishu --target "$TARGET" --message "$(cat)" >> "$LOG_FILE" 2>&1
   log "推送完成（模板版）"
+  echo "${DATE},${DAY_NUMBER},\"${TITLE}\",sent" >> "$HISTORY_FILE"
 else
   log "openclaw 命令不可用，推送跳过"
+  echo "${DATE},${DAY_NUMBER},\"${TITLE}\",failed_no_openclaw" >> "$HISTORY_FILE"
   exit 1
 fi
 
