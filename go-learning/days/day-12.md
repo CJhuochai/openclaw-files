@@ -34,6 +34,10 @@ func (p *Person) Rename(newName string) {
 
 💡 原则：能用值就用值，需要修改原始数据才用指针！
 
+
+## 深入学习入口
+📘 详细学习文档：`go-learning/docs/day-12-detail.md`
+
 ## 打卡模板
 - [ ] 完成 3 个任务
 - [ ] 记录 1 个 Go vs Java 差异

@@ -23,6 +23,10 @@ Go: package main → func main() { fmt.Println... }
 
 💡 阳光提醒：安装顺利吗？有问题随时问我！
 
+
+## 深入学习入口
+📘 详细学习文档：`go-learning/docs/day-01-detail.md`
+
 ## 打卡模板
 - [ ] 完成 3 个任务
 - [ ] 记录 1 个 Go vs Java 差异

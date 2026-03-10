@@ -29,6 +29,10 @@ const PI = 3.14
 
 💡 记忆点：Go喜欢简洁，能省则省！
 
+
+## 深入学习入口
+📘 详细学习文档：`go-learning/docs/day-02-detail.md`
+
 ## 打卡模板
 - [ ] 完成 3 个任务
 - [ ] 记录 1 个 Go vs Java 差异

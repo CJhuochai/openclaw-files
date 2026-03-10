@@ -28,6 +28,10 @@ for range             // 遍历
 
 💡 发现：Go的设计追求“少即是多”！
 
+
+## 深入学习入口
+📘 详细学习文档：`go-learning/docs/day-03-detail.md`
+
 ## 打卡模板
 - [ ] 完成 3 个任务
 - [ ] 记录 1 个 Go vs Java 差异

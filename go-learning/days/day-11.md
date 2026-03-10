@@ -40,6 +40,10 @@ if s, ok := i.(string); ok {
 
 💡 实用技巧：多使用类型判断，避免panic！
 
+
+## 深入学习入口
+📘 详细学习文档：`go-learning/docs/day-11-detail.md`
+
 ## 打卡模板
 - [ ] 完成 3 个任务
 - [ ] 记录 1 个 Go vs Java 差异

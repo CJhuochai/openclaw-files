@@ -38,6 +38,10 @@ func divide(a, b float64) (result float64, err error) {
 
 💡 优势：错误处理更优雅！
 
+
+## 深入学习入口
+📘 详细学习文档：`go-learning/docs/day-04-detail.md`
+
 ## 打卡模板
 - [ ] 完成 3 个任务
 - [ ] 记录 1 个 Go vs Java 差异

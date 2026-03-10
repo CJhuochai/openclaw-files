@@ -33,6 +33,10 @@ type SimpleLibrary struct {
 
 💡 挑战：思考如何用Go实现Java中熟悉的模式！
 
+
+## 深入学习入口
+📘 详细学习文档：`go-learning/docs/day-13-detail.md`
+
 ## 打卡模板
 - [ ] 完成 3 个任务
 - [ ] 记录 1 个 Go vs Java 差异
