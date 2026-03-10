@@ -1,56 +1,75 @@
 #!/bin/bash
 
-# 每日学习推送脚本
-# 用于向用户发送当天的Go学习内容
+# 每日学习提醒推送（简洁模板版）
+# 数据源：go-learning/days/day-XX.md + REMINDER_TEMPLATE.md
+
+set -e
 
 LOG_FILE="/root/.openclaw/workspace/automation-workflows/logs/daily-push.log"
+TEMPLATE_FILE="/root/.openclaw/workspace/go-learning/daily-push/REMINDER_TEMPLATE.md"
+DAYS_DIR="/root/.openclaw/workspace/go-learning/days"
+START_DATE="2026-02-26"
+TARGET="ou_0e8a1150105275ba817a4350097db1e3"
+
 DATE=$(date '+%Y-%m-%d')
-DAY_NUMBER=$(( ($(date -d "$DATE" +%s) - $(date -d "2026-02-26" +%s)) / 86400 + 1 ))
+DAY_NUMBER=$(( ($(date -d "$DATE" +%s) - $(date -d "$START_DATE" +%s)) / 86400 + 1 ))
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] 开始执行每日学习推送" >> "$LOG_FILE"
+# 限定 1~56
+if [[ $DAY_NUMBER -lt 1 ]]; then DAY_NUMBER=1; fi
+if [[ $DAY_NUMBER -gt 56 ]]; then DAY_NUMBER=56; fi
 
-# 检查是否有当天的推送文件
-PUSH_FILE="/root/.openclaw/workspace/go-learning/daily-push/${DATE}-day${DAY_NUMBER}.md"
+DAY_PADDED=$(printf "%02d" "$DAY_NUMBER")
+DAY_FILE="$DAYS_DIR/day-${DAY_PADDED}.md"
 
-if [[ -f "$PUSH_FILE" ]]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] 找到推送文件: $PUSH_FILE" >> "$LOG_FILE"
-    
-    # 读取推送内容
-    CONTENT=$(cat "$PUSH_FILE")
-    
-    # 发送推送（使用openclaw message命令）
-    if command -v openclaw >/dev/null 2>&1; then
-        echo "$CONTENT" | openclaw message send --channel feishu --target "ou_0e8a1150105275ba817a4350097db1e3" --message "$(cat)" >> "$LOG_FILE" 2>&1
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] 推送完成" >> "$LOG_FILE"
-    else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] openclaw工具不可用，跳过推送" >> "$LOG_FILE"
-    fi
-else
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] 未找到推送文件: $PUSH_FILE" >> "$LOG_FILE"
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] 尝试使用计划表内容" >> "$LOG_FILE"
-    
-    # 如果没有具体的推送文件，尝试从学习计划表中提取内容
-    PLAN_FILE="/root/.openclaw/workspace/go-learning/Go语言每日学习计划-56天推送表.md"
-    if [[ -f "$PLAN_FILE" ]]; then
-        # 提取第$DAY_NUMBER天的内容
-        CONTENT=$(grep -A 20 "第${DAY_NUMBER}天 - " "$PLAN_FILE" | head -25)
-        
-        if [[ -n "$CONTENT" ]]; then
-            echo "[$(date '+%Y-%m-%d %H:%M:%S')] 从计划表提取到内容" >> "$LOG_FILE"
-            
-            # 发送推送
-            if command -v openclaw >/dev/null 2>&1; then
-                echo "$CONTENT" | openclaw message send --channel feishu --target "ou_0e8a1150105275ba817a4350097db1e3" --message "$(cat)" >> "$LOG_FILE" 2>&1
-                echo "[$(date '+%Y-%m-%d %H:%M:%S')] 推送完成" >> "$LOG_FILE"
-            else
-                echo "[$(date '+%Y-%m-%d %H:%M:%S')] openclaw工具不可用，跳过推送" >> "$LOG_FILE"
-            fi
-        else
-            echo "[$(date '+%m-%d %H:%M:%S')] 无法从计划表提取第${DAY_NUMBER}天内容" >> "$LOG_FILE"
-        fi
-    else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] 学习计划表文件不存在: $PLAN_FILE" >> "$LOG_FILE"
-    fi
+log() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
+}
+
+log "开始执行每日学习推送（模板版），Day=${DAY_NUMBER}"
+
+if [[ ! -f "$TEMPLATE_FILE" ]]; then
+  log "模板文件不存在: $TEMPLATE_FILE"
+  exit 1
 fi
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] 每日学习推送脚本执行完成" >> "$LOG_FILE"
+if [[ ! -f "$DAY_FILE" ]]; then
+  log "day 文件不存在: $DAY_FILE"
+  exit 1
+fi
+
+# 解析标题：# Day XX/56 - 标题
+TITLE=$(head -n 1 "$DAY_FILE" | sed -E 's/^# Day [0-9]+\/56 - //')
+
+# 解析任务：优先提取“今日任务”后的三条编号
+TASKS=$(awk '
+  /今日任务：/ {flag=1; next}
+  flag && /^[0-9]+\)/ {print; count++; if (count==3) exit}
+' "$DAY_FILE")
+
+TASK_1=$(echo "$TASKS" | sed -n '1p' | sed -E 's/^[0-9]+\)\s*//')
+TASK_2=$(echo "$TASKS" | sed -n '2p' | sed -E 's/^[0-9]+\)\s*//')
+TASK_3=$(echo "$TASKS" | sed -n '3p' | sed -E 's/^[0-9]+\)\s*//')
+
+# 兜底任务
+[[ -z "$TASK_1" ]] && TASK_1="阅读今日主题与核心概念"
+[[ -z "$TASK_2" ]] && TASK_2="完成一个最小可运行示例"
+[[ -z "$TASK_3" ]] && TASK_3="记录一条 Go vs Java 差异"
+
+# 生成消息内容
+CONTENT=$(cat "$TEMPLATE_FILE")
+CONTENT=${CONTENT//\{\{DAY\}\}/$DAY_NUMBER}
+CONTENT=${CONTENT//\{\{DAY_PADDED\}\}/$DAY_PADDED}
+CONTENT=${CONTENT//\{\{TITLE\}\}/$TITLE}
+CONTENT=${CONTENT//\{\{TASK_1\}\}/$TASK_1}
+CONTENT=${CONTENT//\{\{TASK_2\}\}/$TASK_2}
+CONTENT=${CONTENT//\{\{TASK_3\}\}/$TASK_3}
+
+if command -v openclaw >/dev/null 2>&1; then
+  echo "$CONTENT" | openclaw message send --channel feishu --target "$TARGET" --message "$(cat)" >> "$LOG_FILE" 2>&1
+  log "推送完成（模板版）"
+else
+  log "openclaw 命令不可用，推送跳过"
+  exit 1
+fi
+
+log "每日学习推送脚本执行完成"
