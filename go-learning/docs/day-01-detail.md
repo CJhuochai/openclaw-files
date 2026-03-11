@@ -51,12 +51,10 @@ func load(topic string) (string, error) {
 func main() {
     out, err := load("day-01")
     if err != nil {
-        fmt.Printf("[ERROR] %v
-", err)
+        fmt.Printf("[ERROR] %v\n", err)
         return
     }
-    fmt.Printf("[INFO] %s
-", out)
+    fmt.Printf("[INFO] %s\n", out)
 }
 ```
 
